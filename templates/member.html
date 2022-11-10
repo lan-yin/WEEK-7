@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>會員頁</title>
+    <link rel="stylesheet" href="../styles/style.css" />
+  </head>
+  <body>
+    <header><h1>歡迎光臨，這是會員頁</h1></header>
+    <main>
+      <h3 class="memberWelcome">{{ name }}，歡迎登入系統</h3>
+      <a href="/signout">登出系統</a>
+      <br />
+      <br />
+      <hr />
+      <br />
+      <form action="/message" method="POST">
+        <h3 class="tittle">快來留言吧</h3>
+        <div class="input">
+          <h3>內容</h3>
+          <input type="text" name="mesg" />
+        </div>
+        <button>送出</button>
+      </form>
+      <div class="message"></div>
+      <form id="noAction1">
+        <h3 class="tittle">查詢會員姓名</h3>
+        <div class="input">
+          <input type="text" name="username" required/>
+          <button class="query">查詢</button>
+        </div>
+        <div class="show_name"></div>
+      </form>
+      <form id="noAction2">
+        <h3 class="tittle">更新我的姓名</h3>
+        <div class="input">
+          <input type="text" name="new_name" required placeholder="輸入新的姓名"/>
+          <button class="update">更新</button>
+        </div>
+        <div class="new_name"></div>
+      </form>
+    </main>
+  </body>
+  <script>
+    document.getElementById("noAction1").addEventListener('submit', function (event) { event.preventDefault()});
+    document.getElementById("noAction2").addEventListener('submit', function (event) { event.preventDefault()});
+    button = document.querySelector(".query")
+    updateBtn = document.querySelector(".update")
+    button.addEventListener("click", async function fetchData() {
+      document.querySelector(".show_name").innerHTML = "";
+      const username = document.querySelector("div.input input[name = 'username']").value;
+      url = "http://127.0.0.1:3000/api/member?username=" + username; 
+      let res = await fetch(url, { 
+                                  method: "GET",
+                                  credentials: 'include',
+                                  headers:{
+                                  Accept:'application.json',
+                                  'Content-Type': 'application/json'
+                                  }});
+      let data = await res.json();
+      showResponse(data);
+      
+    });
+    function showResponse(data) {
+      let dataStr = ""
+      if (data["success"] == true) {
+        let name = data["data"]["name"]
+        let username = data["data"]["username"]
+        dataStr = name + " ( " + username + " )"
+      } else {
+        dataStr = data["info"]
+      }
+      document.querySelector(".show_name").innerHTML = dataStr;
+    }
+    updateBtn.addEventListener("click", async function updateData() {
+      const new_name = document.querySelector("div.input input[name = 'new_name']").value;
+      url = "http://127.0.0.1:3000/api/member"
+      let res = await fetch(url, {
+        method:"PATCH",
+        credentials: 'include',
+        headers:{
+          Accept:'application.json',
+          'Content-Type': 'application/json'
+          },
+        body:`{"name":"${new_name}"}`   // 要記得 =>：(冒號)兩邊都是字串
+      })
+      let data = await res.json();
+      // console.log(data["name"])
+      updateName = data["name"]
+      showUpdate(updateName);
+
+      function showUpdate(name) {
+        dataStr = ""
+        if (data["name"]) {
+          dataStr = data["name"]
+          document.querySelector(".memberWelcome").innerHTML = dataStr + "，歡迎登入系統"
+          return document.querySelector(".new_name").innerHTML = dataStr + "更新成功！"
+        } 
+        else {
+          dataStr = "更新發生錯誤"
+          return document.querySelector(".new_name").innerHTML = dataStr
+        }
+      }
+
+    })
+    
+  </script>
+</html>

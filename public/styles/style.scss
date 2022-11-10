@@ -1,0 +1,82 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  color: white;
+  background-color: #1d3346;
+  height: 100px;
+  text-align: center;
+  line-height: 100px;
+}
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    h3.tittle {
+      margin: 30px 10px 10px 10px;
+      font-size: 1.5rem;
+    }
+    div.input {
+      display: flex;
+      margin: 10px;
+      align-items: center;
+      justify-content: center;
+      h3 {
+        margin: 10px;
+      }
+      input {
+        line-height: 30px;
+        margin-right: 10px;
+      }
+    }
+    button {
+      padding: 5px;
+    }
+  }
+  h3.memberWelcome {
+    margin: 30px;
+    font-size: 1.5rem;
+  }
+}
+
+div.cal_box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  h3 {
+    margin: 30px 10px 10px 10px;
+    font-size: 1.5rem;
+  }
+  div.cal_input {
+    display: flex;
+    align-items: center;
+    h3.input {
+      margin: 10px;
+    }
+    input {
+      line-height: 30px;
+    }
+  }
+  button {
+    padding: 5px;
+  }
+}
+
+hr {
+  clear: both;
+  display: block;
+  width: 96%;
+  height: 1px;
+}
