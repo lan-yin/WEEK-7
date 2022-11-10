@@ -21,30 +21,33 @@ mycursor = mydb.cursor(buffered=True)
 
 class UserResponse(Resource):
     def get(self):
-        dictResponse = {"success": False, "info": "查詢失敗", "data":None}
-        try:
-            username = request.args.get("username")
-            sql = "SELECT*FROM member WHERE username=%s"
-            val = (username, )
-            mycursor.execute(sql, val)
-            if mycursor.rowcount > 0:
-                result = mycursor.fetchone()
-                data = {}
-                for i, row in enumerate(result):
-                    key = mycursor.description[i][0]
-                    data[key] = row
-                dictResponse["success"] = True
-                dictResponse["info"] = "查詢成功"
-                dictResponse["data"] = data
-            else:
-                dictResponse["info"] = "無此用戶"
-            mydb.commit()
+        if "username" in session:
+            dictResponse = {"success": False, "info": "查詢失敗", "data":None}
+            try:
+                username = request.args.get("username")
+                sql = "SELECT*FROM member WHERE username=%s"
+                val = (username, )
+                mycursor.execute(sql, val)
+                if mycursor.rowcount > 0:
+                    result = mycursor.fetchone()
+                    data = {}
+                    for i, row in enumerate(result):
+                        key = mycursor.description[i][0]
+                        data[key] = row
+                    dictResponse["success"] = True
+                    dictResponse["info"] = "查詢成功"
+                    dictResponse["data"] = data
+                else:
+                    dictResponse["info"] = "無此用戶"
+                mydb.commit()
 
-        except Exception as e:
-            mydb.rollback()
-            dictResponse["info"] = f"SQL 執行失敗：{e}"
-        
-        return jsonify(dictResponse)
+            except Exception as e:
+                mydb.rollback()
+                dictResponse["info"] = f"SQL 執行失敗：{e}"
+            
+            return jsonify(dictResponse)
+        else:
+            return redirect("/")
 
 
     def patch(self):
