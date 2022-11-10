@@ -48,36 +48,36 @@
     document.getElementById("noAction2").addEventListener('submit', function (event) { event.preventDefault()});
     button = document.querySelector(".query")
     updateBtn = document.querySelector(".update")
-    button.addEventListener("click", async function fetchData() {
+    button.addEventListener("click", function fetchData() {
       document.querySelector(".show_name").innerHTML = "";
       const username = document.querySelector("div.input input[name = 'username']").value;
       url = "http://127.0.0.1:3000/api/member?username=" + username; 
-      let res = await fetch(url, { 
-                                  method: "GET",
-                                  credentials: 'include',
-                                  headers:{
-                                  Accept:'application.json',
-                                  'Content-Type': 'application/json'
-                                  }});
-      let data = await res.json();
-      showResponse(data);
-      
+      fetch(url, { 
+                  method: "GET",
+                  credentials: 'include',
+                  headers:{
+                    Accept:'application.json',
+                    'Content-Type': 'application/json'
+                     }}
+      ).then(res => res.json()
+      ).then(function(data){
+        dataStr = ""
+        if (data["data"] != null) {
+          let name = data["data"]["name"]
+          let username = data["data"]["username"]
+          dataStr = name + " ( " + username + " )"
+        } else {
+          dataStr = "查詢失敗"
+        }
+        document.querySelector(".show_name").innerHTML = dataStr;
+      })
     });
-    function showResponse(data) {
-      let dataStr = ""
-      if (data["success"] == true) {
-        let name = data["data"]["name"]
-        let username = data["data"]["username"]
-        dataStr = name + " ( " + username + " )"
-      } else {
-        dataStr = data["info"]
-      }
-      document.querySelector(".show_name").innerHTML = dataStr;
-    }
-    updateBtn.addEventListener("click", async function updateData() {
+
+    
+    updateBtn.addEventListener("click", function updateData() {
       const new_name = document.querySelector("div.input input[name = 'new_name']").value;
       url = "http://127.0.0.1:3000/api/member"
-      let res = await fetch(url, {
+      fetch(url, {
         method:"PATCH",
         credentials: 'include',
         headers:{
@@ -85,25 +85,14 @@
           'Content-Type': 'application/json'
           },
         body:`{"name":"${new_name}"}`   // 要記得 =>：(冒號)兩邊都是字串
-      })
-      let data = await res.json();
-      // console.log(data["name"])
-      updateName = data["name"]
-      showUpdate(updateName);
-
-      function showUpdate(name) {
-        dataStr = ""
-        if (data["name"]) {
-          dataStr = data["name"]
-          document.querySelector(".memberWelcome").innerHTML = dataStr + "，歡迎登入系統"
-          return document.querySelector(".new_name").innerHTML = dataStr + "更新成功！"
-        } 
-        else {
-          dataStr = "更新發生錯誤"
-          return document.querySelector(".new_name").innerHTML = dataStr
-        }
-      }
-
+      }).then(res => res.json()
+      ).then(function(data) {
+        if ("ok" in data) {
+          document.querySelector(".memberWelcome").innerHTML = new_name + "，歡迎登入系統"
+          document.querySelector(".new_name").innerHTML = new_name + "更新成功！"
+        } else {
+          document.querySelector(".new_name").innerHTML = "更新發生錯誤"
+        }})
     })
     
   </script>

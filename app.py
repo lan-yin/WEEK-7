@@ -9,7 +9,7 @@ poolname = "mysqlpool"
 poolsize = 32
 host = "localhost"
 user = "root"
-password = "root@2022"
+password = ""
 database = "website"
 
 cnxpool = mysql.connector.pooling.MySQLConnectionPool(
@@ -22,10 +22,10 @@ mycursor = mydb.cursor(buffered=True)
 class UserResponse(Resource):
     def get(self):
         if "username" in session:
-            dictResponse = {"success": False, "info": "查詢失敗", "data":None}
+            dictResponse = {"data":None}
             try:
                 username = request.args.get("username")
-                sql = "SELECT*FROM member WHERE username=%s"
+                sql = "SELECT id, name, username FROM member WHERE username=%s"
                 val = (username, )
                 mycursor.execute(sql, val)
                 if mycursor.rowcount > 0:
@@ -34,24 +34,19 @@ class UserResponse(Resource):
                     for i, row in enumerate(result):
                         key = mycursor.description[i][0]
                         data[key] = row
-                    dictResponse["success"] = True
-                    dictResponse["info"] = "查詢成功"
                     dictResponse["data"] = data
+                    mydb.commit()
+                    return jsonify(dictResponse)
                 else:
-                    dictResponse["info"] = "無此用戶"
-                mydb.commit()
-
+                    return jsonify(dictResponse)
             except Exception as e:
-                mydb.rollback()
-                dictResponse["info"] = f"SQL 執行失敗：{e}"
+                return jsonify(dictResponse)
             
-            return jsonify(dictResponse)
-        else:
-            return redirect("/")
+        else:         
+            return jsonify({"data":None})
 
 
     def patch(self):
-        dictResponse = {"name": None}
         try:
             name = request.get_json()["name"]
             # username = "test6"
@@ -63,11 +58,7 @@ class UserResponse(Resource):
             mycursor.execute(sql, val)
             mydb.commit()
             session["name"] = name
-            dictResponse["name"] = name
-            dictResponse["ok"] = True
-            # response = make_response(dictResponse)
-            return jsonify(dictResponse)
-            # return response
+            return jsonify({"ok": True})
         except:
             return jsonify({"error": True})
         
